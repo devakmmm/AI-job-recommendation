@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobMatch Pro - AI-Powered Job Matching</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .upload-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            background: linear-gradient(45deg, #f8f9ff 0%, #e8f0ff 100%);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: linear-gradient(45deg, #f0f4ff 0%, #e0ebff 100%);
+            transform: translateY(-2px);
+        }
+
+        .upload-area.drag-over {
+            border-color: #4CAF50;
+            background: linear-gradient(45deg, #f0fff0 0%, #e8ffe8 100%);
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.3em;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .preferences-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .preferences-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .results-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .job-card {
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8f0ff 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .job-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .job-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .job-company {
+            color: #667eea;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .job-location {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .job-match {
+            background: linear-gradient(45deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .job-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .skill-tag {
+            background: #667eea;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .resume-preview {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .resume-section {
+            margin-bottom: 15px;
+        }
+
+        .resume-section h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>JobMatch Pro</h1>
+            <p>AI-Powered Job Matching Based on Your Resume</p>
+        </div>
+
+        <div class="upload-section">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📄</div>
+                <div class="upload-text">Drop your resume here or click to browse</div>
+                <div class="upload-subtext">Supports PDF, DOC, DOCX, TXT files</div>
+                <input type="file" class="file-input" id="fileInput" accept=".pdf,.doc,.docx,.txt">
+            </div>
+            <button class="btn" onclick="document.getElementById('fileInput').click()">
+                Choose Resume File
+            </button>
+        </div>
+
+        <div class="preferences-section">
+            <h2>Job Preferences</h2>
+            <div class="preferences-grid">
+                <div class="form-group">
+                    <label for="jobType">Job Type</label>
+                    <select id="jobType">
+                        <option value="all">All Types</option>
+                        <option value="full-time">Full-time</option>
+                        <option value="part-time">Part-time</option>
+                        <option value="contract">Contract</option>
+                        <option value="remote">Remote</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="location">Preferred Location</label>
+                    <input type="text" id="location" placeholder="e.g., New York, NY">
+                </div>
+                <div class="form-group">
+                    <label for="salaryRange">Salary Range</label>
+                    <select id="salaryRange">
+                        <option value="any">Any Range</option>
+                        <option value="30k-50k">$30K - $50K</option>
+                        <option value="50k-80k">$50K - $80K</option>
+                        <option value="80k-120k">$80K - $120K</option>
+                        <option value="120k+">$120K+</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="experience">Experience Level</label>
+                    <select id="experience">
+                        <option value="any">Any Level</option>
+                        <option value="entry">Entry Level</option>
+                        <option value="mid">Mid Level</option>
+                        <option value="senior">Senior Level</option>
+                        <option value="executive">Executive</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn" onclick="findJobs()">Find Matching Jobs</button>
+        </div>
+
+        <div class="results-section hidden" id="resultsSection">
+            <h2>Job Matches</h2>
+            <div class="stats-grid" id="statsGrid"></div>
+            <div id="jobResults"></div>
+        </div>
+    </div>
+
+    <script>
+        let resumeData = null;
+        let parsedResume = null;
+
+        // Sample job database (in a real application, this would come from APIs)
+        const jobDatabase = [
+            {
+                title: "Senior Software Engineer",
+                company: "TechCorp Inc.",
+                location: "San Francisco, CA",
+                type: "full-time",
+                salary: "120k+",
+                experience: "senior",
+                skills: ["JavaScript", "React", "Node.js", "Python", "AWS"],
+                description: "Lead development of scalable web applications using modern technologies.",
+                matchScore: 0
+            },
+            {
+                title: "Frontend Developer",
+                company: "StartupXYZ",
+                location: "New York, NY",
+                type: "full-time",
+                salary: "80k-120k",
+                experience: "mid",
+                skills: ["HTML", "CSS", "JavaScript", "React", "Vue.js"],
+                description: "Build responsive user interfaces for our growing platform.",
+                matchScore: 0
+            },
+            {
+                title: "Data Scientist",
+                company: "DataCorp",
+                location: "Remote",
+                type: "remote",
+                salary: "100k-150k",
+                experience: "mid",
+                skills: ["Python", "Machine Learning", "SQL", "TensorFlow", "Pandas"],
+                description: "Analyze large datasets to drive business insights and build ML models.",
+                matchScore: 0
+            },
+            {
+                title: "DevOps Engineer",
+                company: "CloudTech",
+                location: "Seattle, WA",
+                type: "full-time",
+                salary: "90k-130k",
+                experience: "mid",
+                skills: ["Docker", "Kubernetes", "AWS", "Jenkins", "Python"],
+                description: "Manage cloud infrastructure and CI/CD pipelines.",
+                matchScore: 0
+            },
+            {
+                title: "Product Manager",
+                company: "InnovateNow",
+                location: "Boston, MA",
+                type: "full-time",
+                salary: "110k-140k",
+                experience: "senior",
+                skills: ["Product Strategy", "Analytics", "Agile", "User Research"],
+                description: "Drive product vision and work with cross-functional teams.",
+                matchScore: 0
+            },
+            {
+                title: "UX Designer",
+                company: "DesignStudio",
+                location: "Los Angeles, CA",
+                type: "contract",
+                salary: "70k-100k",
+                experience: "mid",
+                skills: ["Figma", "User Research", "Prototyping", "Adobe Creative Suite"],
+                description: "Create intuitive user experiences for digital products.",
+                matchScore: 0
+            },
+            {
+                title: "Backend Developer",
+                company: "ServerSide Solutions",
+                location: "Chicago, IL",
+                type: "full-time",
+                salary: "85k-115k",
+                experience: "mid",
+                skills: ["Java", "Spring Boot", "PostgreSQL", "Redis", "Microservices"],
+                description: "Build robust server-side applications and APIs.",
+                matchScore: 0
+            },
+            {
+                title: "Mobile Developer",
+                company: "AppBuilder Inc.",
+                location: "Austin, TX",
+                type: "full-time",
+                salary: "90k-120k",
+                experience: "mid",
+                skills: ["React Native", "iOS", "Android", "Swift", "Kotlin"],
+                description: "Develop cross-platform mobile applications.",
+                matchScore: 0
+            }
+        ];
+
+        // File upload handling
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileUpload(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileUpload(e.target.files[0]);
+            }
+        });
+
+        function handleFileUpload(file) {
+            resumeData = file;
+            uploadArea.innerHTML = `
+                <div class="upload-icon">✅</div>
+                <div class="upload-text">Resume uploaded: ${file.name}</div>
+                <div class="upload-subtext">File size: ${(file.size / 1024).toFixed(2)} KB</div>
+            `;
+            
+            // Simulate resume parsing
+            parseResume(file);
+        }
+
+        function parseResume(file) {
+            // In a real application, this would use OCR or document parsing APIs
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                simulateResumeParser(content);
+            };
+            reader.readAsText(file);
+        }
+
+        function simulateResumeParser(content) {
+            // Simulate AI parsing of resume content
+            const commonSkills = [
+                'JavaScript', 'Python', 'React', 'Node.js', 'HTML', 'CSS', 'SQL',
+                'Java', 'C++', 'Machine Learning', 'AWS', 'Docker', 'Git',
+                'Project Management', 'Agile', 'Scrum', 'Data Analysis'
+            ];
+
+            const detectedSkills = commonSkills.filter(skill => 
+                content.toLowerCase().includes(skill.toLowerCase())
+            );
+
+            // If no skills detected from content, use sample skills
+            if (detectedSkills.length === 0) {
+                detectedSkills.push('JavaScript', 'React', 'Node.js', 'Python', 'HTML', 'CSS');
+            }
+
+            parsedResume = {
+                skills: detectedSkills,
+                experience: determineExperienceLevel(content),
+                education: extractEducation(content),
+                jobTitles: extractJobTitles(content)
+            };
+
+            displayResumePreview();
+        }
+
+        function determineExperienceLevel(content) {
+            const experienceKeywords = {
+                'entry': ['intern', 'graduate', 'junior', 'entry'],
+                'mid': ['developer', 'analyst', 'specialist', '2 years', '3 years'],
+                'senior': ['senior', 'lead', 'manager', '5 years', '7 years'],
+                'executive': ['director', 'vp', 'ceo', 'cto', '10 years']
+            };
+
+            const lowerContent = content.toLowerCase();
+            
+            for (const [level, keywords] of Object.entries(experienceKeywords)) {
+                if (keywords.some(keyword => lowerContent.includes(keyword))) {
+                    return level;
+                }
+            }
+            
+            return 'mid'; // default
+        }
+
+        function extractEducation(content) {
+            const degrees = ['bachelor', 'master', 'phd', 'mba', 'bs', 'ms', 'ba', 'ma'];
+            const lowerContent = content.toLowerCase();
+            
+            for (const degree of degrees) {
+                if (lowerContent.includes(degree)) {
+                    return degree.toUpperCase();
+                }
+            }
+            
+            return 'Bachelor\'s Degree';
+        }
+
+        function extractJobTitles(content) {
+            const commonTitles = [
+                'software engineer', 'developer', 'data scientist', 'product manager',
+                'designer', 'analyst', 'consultant', 'manager', 'coordinator'
+            ];
+            
+            const lowerContent = content.toLowerCase();
+            return commonTitles.filter(title => lowerContent.includes(title));
+        }
+
+        function displayResumePreview() {
+            const previewHtml = `
+                <div class="resume-preview">
+                    <h3>📋 Resume Analysis</h3>
+                    <div class="resume-section">
+                        <h4>Detected Skills:</h4>
+                        <div class="job-skills">
+                            ${parsedResume.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="resume-section">
+                        <h4>Experience Level:</h4>
+                        <p>${parsedResume.experience.charAt(0).toUpperCase() + parsedResume.experience.slice(1)} Level</p>
+                    </div>
+                    <div class="resume-section">
+                        <h4>Education:</h4>
+                        <p>${parsedResume.education}</p>
+                    </div>
+                </div>
+            `;
+            
+            document.querySelector('.upload-section').insertAdjacentHTML('beforeend', previewHtml);
+        }
+
+        function findJobs() {
+            if (!parsedResume) {
+                alert('Please upload a resume first!');
+                return;
+            }
+
+            const preferences = {
+                jobType: document.getElementById('jobType').value,
+                location: document.getElementById('location').value,
+                salaryRange: document.getElementById('salaryRange').value,
+                experience: document.getElementById('experience').value
+            };
+
+            // Show loading state
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.classList.remove('hidden');
+            document.getElementById('jobResults').innerHTML = '<div class="loading">Finding your perfect matches...</div>';
+
+            // Simulate API call delay
+            setTimeout(() => {
+                const matchedJobs = calculateJobMatches(preferences);
+                displayJobResults(matchedJobs);
+            }, 2000);
+        }
+
+        function calculateJobMatches(preferences) {
+            let filteredJobs = jobDatabase.filter(job => {
+                // Filter by preferences
+                if (preferences.jobType !== 'all' && job.type !== preferences.jobType) return false;
+                if (preferences.salaryRange !== 'any' && job.salary !== preferences.salaryRange) return false;
+                if (preferences.experience !== 'any' && job.experience !== preferences.experience) return false;
+                if (preferences.location && !job.location.toLowerCase().includes(preferences.location.toLowerCase())) return false;
+                
+                return true;
+            });
+
+            // Calculate match scores
+            filteredJobs = filteredJobs.map(job => {
+                const skillMatch = calculateSkillMatch(parsedResume.skills, job.skills);
+                const experienceMatch = job.experience === parsedResume.experience ? 20 : 0;
+                
+                job.matchScore = Math.min(100, skillMatch + experienceMatch + Math.random() * 10);
+                return job;
+            });
+
+            // Sort by match score
+            return filteredJobs.sort((a, b) => b.matchScore - a.matchScore);
+        }
+
+        function calculateSkillMatch(resumeSkills, jobSkills) {
+            const matchingSkills = resumeSkills.filter(skill => 
+                jobSkills.some(jobSkill => 
+                    jobSkill.toLowerCase().includes(skill.toLowerCase()) ||
+                    skill.toLowerCase().includes(jobSkill.toLowerCase())
+                )
+            );
+            
+            return (matchingSkills.length / jobSkills.length) * 80;
+        }
+
+        function displayJobResults(jobs) {
+            const statsHtml = `
+                <div class="stat-card">
+                    <div class="stat-number">${jobs.length}</div>
+                    <div class="stat-label">Job Matches</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${jobs.filter(j => j.matchScore > 70).length}</div>
+                    <div class="stat-label">Great Matches</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${Math.round(jobs.reduce((acc, job) => acc + job.matchScore, 0) / jobs.length) || 0}%</div>
+                    <div class="stat-label">Avg Match</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${jobs.filter(j => j.type === 'remote').length}</div>
+                    <div class="stat-label">Remote Jobs</div>
+                </div>
+            `;
+
+            document.getElementById('statsGrid').innerHTML = statsHtml;
+
+            const jobsHtml = jobs.map(job => `
+                <div class="job-card animate-fade-in">
+                    <div class="job-match">${Math.round(job.matchScore)}% Match</div>
+                    <div class="job-title">${job.title}</div>
+                    <div class="job-company">🏢 ${job.company}</div>
+                    <div class="job-location">📍 ${job.location}</div>
+                    <div class="job-location">💰 ${job.salary.replace('k', 'K')}</div>
+                    <p style="margin: 10px 0; color: #666;">${job.description}</p>
+                    <div class="job-skills">
+                        ${job.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('jobResults').innerHTML = jobsHtml || '<p>No jobs match your criteria. Try adjusting your preferences.</p>';
+        }
+    </script>
+</body>
+</html>
